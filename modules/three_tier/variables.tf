@@ -1,0 +1,11 @@
+variable "name_prefix" { type = string }
+variable "region" { type = string }
+variable "vpc_cidr" { type = string }
+variable "azs" { type = list(string) }
+variable "code_bucket_name" { type = string }
+variable "web_instance_type" { type = string }
+variable "app_instance_type" { type = string }
+variable "web_desired" { type = number }
+variable "app_desired" { type = number }
+variable "web_user_data" { type = string }
+variable "app_user_data" { type = string }
