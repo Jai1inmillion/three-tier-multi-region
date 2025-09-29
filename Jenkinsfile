@@ -42,17 +42,26 @@ pipeline {
       }
     }
 
-    stage('Install Terraform (local to workspace)') {
+    stage('Install Terraform (Ubuntu)') {
       steps {
         sh '''
           set -eux
           mkdir -p .tfbin
-          if [ ! -x ".tfbin/terraform" ]; then
-            echo "Installing Terraform ${TF_VERSION} into workspace..."
-            curl -fsSLo .tfbin/terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+
+          # Ensure unzip is present (Ubuntu)
+          if ! command -v unzip >/dev/null 2>&1; then
+            export DEBIAN_FRONTEND=noninteractive
+            sudo apt-get update
+            sudo apt-get install -y unzip
+          fi
+
+          # Download & install pinned Terraform
+          if [ ! -x ".tfbin/terraform" ] || [ "$(.tfbin/terraform version -json | jq -r .terraform_version || echo 0)" != "${TF_VERSION}" ]; then
+            curl -fsSLo .tfbin/terraform.zip "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
             unzip -o .tfbin/terraform.zip -d .tfbin
             chmod +x .tfbin/terraform
           fi
+
           ./.tfbin/terraform -version
         '''
       }
