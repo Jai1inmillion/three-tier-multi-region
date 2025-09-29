@@ -18,7 +18,7 @@ pipeline {
 
   environment {
     TF_IN_AUTOMATION = '1'
-    TF_VERSION       = '1.6.6'
+    TF_VERSION       = '1.13.3'
     // Pass params to Terraform variables
     TF_VAR_primary_region   = "${params.PRIMARY_REGION}"
     TF_VAR_secondary_region = "${params.SECONDARY_REGION}"
