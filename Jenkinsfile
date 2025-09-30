@@ -84,7 +84,7 @@ pipeline {
             record_name      = "${RECORD_NAME}"
             alert_email      = "${ALERT_EMAIL}"
             db_username      = "admin"
-            db_password      = "Jaipreet2025!"
+            db_password      = "${DB_PASS}"
             EOF
             echo "=== terraform.auto.tfvars ==="
             cat terraform.auto.tfvars
