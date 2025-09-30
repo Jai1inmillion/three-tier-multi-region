@@ -13,6 +13,7 @@ pipeline {
     string(name: 'PRIMARY_REGION',   defaultValue: 'us-east-2',       description: 'Primary region')
     string(name: 'SECONDARY_REGION', defaultValue: 'us-east-1',       description: 'Secondary region')
     string(name: 'ALERT_EMAIL',      defaultValue: 'jaihanspal@gmail.com', description: 'SNS email')
+     string(name: 'DB_PASS',      defaultValue: 'Jaipreet2025!', description: 'DB password')
     booleanParam(name: 'AUTO_APPLY', defaultValue: true, description: 'If false, require manual approval before apply')
   }
 
