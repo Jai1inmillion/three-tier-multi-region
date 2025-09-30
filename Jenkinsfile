@@ -106,7 +106,6 @@ pipeline {
         withEnv(["PATH+TF=${WORKSPACE}/.tfbin"]) {
           sh '''
             set -eux
-            terraform fmt -recursive
             terraform validate
             terraform plan -input=false -out=tfplan.bin
             terraform show -no-color tfplan.bin > tfplan.txt
