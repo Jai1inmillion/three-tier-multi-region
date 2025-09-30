@@ -93,23 +93,15 @@ pipeline {
       }
     }
 
-    stage('Terraform Init') {
-      steps {
-        withEnv(["PATH+TF=${WORKSPACE}/.tfbin"]) {
-          sh 'terraform init -input=false'
-        }
-      }
-    }
-
-    stage('Validate & Plan') {
-      steps {
-        withEnv(["PATH+TF=${WORKSPACE}/.tfbin"]) 
-         withCredentials([ string(credentialsId: 'rds-db-password', variable: 'TF_VAR_db_password') ]){
-          sh '''
-            set -eux
-            terraform validate
-            terraform plan -input=false -out=tfplan.bin
-            terraform show -no-color tfplan.bin > tfplan.txt
+    stage('Terraform Init/Plan') {
+  steps {
+    withEnv(["PATH+TF=${WORKSPACE}/.tfbin"]) {
+      withCredentials([ string(credentialsId: 'rds-db-password', variable: 'TF_VAR_db_password') ]) {
+        sh '''
+          set -eux
+          terraform init -input=false
+          terraform validate -no-color
+          terraform plan -input=false -out=tfplan.bin
           '''
         }
       }
