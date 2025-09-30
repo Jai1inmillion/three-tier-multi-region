@@ -13,7 +13,7 @@ pipeline {
     string(name: 'PRIMARY_REGION',   defaultValue: 'us-east-2',       description: 'Primary region')
     string(name: 'SECONDARY_REGION', defaultValue: 'us-east-1',       description: 'Secondary region')
     string(name: 'ALERT_EMAIL',      defaultValue: 'jaihanspal@gmail.com', description: 'SNS email')
-
+     
     booleanParam(name: 'AUTO_APPLY', defaultValue: true, description: 'If false, require manual approval before apply')
   }
 
@@ -92,22 +92,28 @@ pipeline {
         }
       }
     }
-  
 
-  stage('Terraform Init/Plan') {
-  steps {
-    withEnv(["PATH+TF=${WORKSPACE}/.tfbin"]) {
-      withCredentials([ string(credentialsId: 'rds-db-password', variable: 'TF_VAR_db_password') ]) {
-        sh '''
-          set -eux
-          terraform init -input=false
-          terraform validate -no-color
-          terraform plan -input=false -out=tfplan.bin
-          '''
+    stage('Terraform Init') {
+      steps {
+        withEnv(["PATH+TF=${WORKSPACE}/.tfbin"]) {
+          sh 'terraform init -input=false'
         }
       }
-  }
-  }
+    }
+
+    stage('Validate & Plan') {
+      steps {
+        withEnv(["PATH+TF=${WORKSPACE}/.tfbin"]) {
+          withCredentials([ string(credentialsId: 'rds-db-password', variable: 'TF_VAR_db_password') ]){
+          sh '''
+            set -eux
+            terraform validate
+            terraform plan -input=false -out=tfplan.bin
+            terraform show -no-color tfplan.bin > tfplan.txt
+          '''
+        }
+        }
+      }
       post {
         always {
           archiveArtifacts artifacts: 'tfplan.bin, tfplan.txt, terraform.auto.tfvars', fingerprint: true
