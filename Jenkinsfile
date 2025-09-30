@@ -68,30 +68,25 @@ pipeline {
       }
     }
 
-    stage('Create terraform.auto.tfvars') {
-      steps {
-        withCredentials([
-          // Create this Jenkins credential: Kind=Secret text, ID=rds-db-password
-          string(credentialsId: 'rds-db-password', variable: 'DB_PASS')
-          // If you do NOT use an EC2 Instance Profile on the Jenkins node,
-          // also add AWS credentials here and export AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY/AWS_DEFAULT_REGION.
-        ]) {
-          sh '''
-            set -eux
-            cat > terraform.auto.tfvars <<EOF
-            primary_region   = "${PRIMARY_REGION}"
-            secondary_region = "${SECONDARY_REGION}"
-            domain_name      = "${DOMAIN_NAME}"
-            record_name      = "${RECORD_NAME}"
-            alert_email      = "${ALERT_EMAIL}"
-            db_username      = "admin"
-            EOF
-            echo "=== terraform.auto.tfvars ==="
-            cat terraform.auto.tfvars
-          '''
-        }
-      }
-    }
+    stage('Write terraform.auto.tfvars') {
+  steps {
+    sh '''
+      set -euo pipefail
+      {
+        echo 'primary_region   = "'${PRIMARY_REGION}'"'
+        echo 'secondary_region = "'${SECONDARY_REGION}'"'
+        echo 'domain_name      = "'${DOMAIN_NAME}'"'
+        echo 'record_name      = "'${RECORD_NAME}'"'
+        echo 'alert_email      = "'${ALERT_EMAIL}'"'
+        echo 'db_username      = "admin"'
+      } > terraform.auto.tfvars
+
+      echo "=== terraform.auto.tfvars ==="
+      cat terraform.auto.tfvars
+    '''
+  }
+}
+
 
     stage('Terraform Init') {
       steps {
