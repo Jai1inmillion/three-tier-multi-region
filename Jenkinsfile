@@ -13,7 +13,7 @@ pipeline {
     string(name: 'PRIMARY_REGION',   defaultValue: 'us-east-2',       description: 'Primary region')
     string(name: 'SECONDARY_REGION', defaultValue: 'us-east-1',       description: 'Secondary region')
     string(name: 'ALERT_EMAIL',      defaultValue: 'jaihanspal@gmail.com', description: 'SNS email')
-     string(name: 'DB_PASS',      defaultValue: 'Jaipreet2025!', description: 'DB password')
+
     booleanParam(name: 'AUTO_APPLY', defaultValue: true, description: 'If false, require manual approval before apply')
   }
 
@@ -85,7 +85,6 @@ pipeline {
             record_name      = "${RECORD_NAME}"
             alert_email      = "${ALERT_EMAIL}"
             db_username      = "admin"
-            db_password      = "${DB_PASS}"
             EOF
             echo "=== terraform.auto.tfvars ==="
             cat terraform.auto.tfvars
@@ -104,7 +103,8 @@ pipeline {
 
     stage('Validate & Plan') {
       steps {
-        withEnv(["PATH+TF=${WORKSPACE}/.tfbin"]) {
+        withEnv(["PATH+TF=${WORKSPACE}/.tfbin"]) 
+         withCredentials([ string(credentialsId: 'rds-db-password', variable: 'TF_VAR_db_password') ]){
           sh '''
             set -eux
             terraform validate
