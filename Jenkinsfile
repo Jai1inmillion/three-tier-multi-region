@@ -92,8 +92,9 @@ pipeline {
         }
       }
     }
+  
 
-    stage('Terraform Init/Plan') {
+  stage('Terraform Init/Plan') {
   steps {
     withEnv(["PATH+TF=${WORKSPACE}/.tfbin"]) {
       withCredentials([ string(credentialsId: 'rds-db-password', variable: 'TF_VAR_db_password') ]) {
@@ -105,6 +106,8 @@ pipeline {
           '''
         }
       }
+  }
+  }
       post {
         always {
           archiveArtifacts artifacts: 'tfplan.bin, tfplan.txt, terraform.auto.tfvars', fingerprint: true
